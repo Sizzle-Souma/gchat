@@ -13,3 +13,14 @@ class Message(Base):
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="messages", lazy="joined")
+
+    def as_dict(self):
+        return {
+            "id": self.id,
+            "content": self.content,
+            "date": str(self.date),
+            "owner": {
+                "id": self.owner.id,
+                "username": self.owner.username
+            }
+        }

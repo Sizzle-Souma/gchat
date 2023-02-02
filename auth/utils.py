@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from auth.schemas import TokenData
 from database import get_db
+from user.models import User
 from user.service import get_user_by_username, get_user_by_id
 from utils import verify_password
 
@@ -35,7 +36,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    return get_user_base(token, db)
+
+
+def get_user_base(token: str, db):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="ユーザー認証失敗",
@@ -49,7 +54,7 @@ async def get_user(token: str = Depends(oauth2_scheme), db: Session = Depends(ge
         token_data = TokenData(user_id=user_id)
     except JWTError:
         raise credentials_exception
-    user = get_user_by_id(db, user_id=token_data.user_id)
+    user: User = get_user_by_id(db, user_id=token_data.user_id)
     if user is None:
         raise credentials_exception
     return user
