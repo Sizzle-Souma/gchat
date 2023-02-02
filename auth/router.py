@@ -9,7 +9,9 @@ from .schemas import Token
 from .utils import authenticate_user, create_access_token
 
 ACCESS_TOKEN_EXPIRE_DYS = 14
-router = APIRouter()
+router = APIRouter(
+    tags=["auth"]
+)
 
 
 @router.post("/token", response_model=Token)

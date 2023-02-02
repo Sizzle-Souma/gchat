@@ -1,14 +1,21 @@
+import sys
+from os import environ as env
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# sqlite データベース URL
-SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
+# データベース URL
+try:
+    DATABASE_URL = env['GCHAT_DATABASE_URL']
+except KeyError:
+    print('[error]: `GCHAT_DATABASE_URL` environment variable required')
+    sys.exit(1)
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    DATABASE_URL
 )
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
